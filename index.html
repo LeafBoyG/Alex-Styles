@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alfred Portfolio</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- === Header === -->
+  <header class="site-header container">
+    <h1 class="logo">Alfred</h1>
+    <nav>
+      <ul>
+        <li><a href="#about">About</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- === Hero === -->
+  <section class="hero">
+    <div class="hero-inner container">
+      <h1>
+        <span>Hello,</span> <span>I'm Alfred,</span> <span>Web Creator</span>
+      </h1>
+      <p>Crafting immersive, cinematic, and interactive web experiences.</p>
+      <div class="scroll-cue">↓</div>
+    </div>
+  </section>
+
+  <!-- === About === -->
+  <section id="about" class="container about-content">
+    <img src="about-photo.jpg" alt="Alfred portrait" class="about-photo" />
+    <div class="about-text">
+      <h2>About Me</h2>
+      <p>I’m a detail‑driven creator blending technical mastery with artistic vision. I love building immersive, visually striking portfolios that tell a story.</p>
+      <p>From cinematic transitions to playful micro‑interactions, I aim to make every project memorable and meaningful.</p>
+    </div>
+  </section>
+
+  <!-- === Projects === -->
+  <section id="projects" class="projects">
+    <div class="project-card">
+      <img src="project1.jpg" alt="Project 1 preview" class="project-image" />
+      <div class="project-overlay"></div>
+      <div class="project-text">
+        <h3>Project One</h3>
+        <p>Interactive storytelling website</p>
+      </div>
+    </div>
+
+    <div class="project-card">
+      <img src="project2.jpg" alt="Project 2 preview" class="project-image" />
+      <div class="project-overlay"></div>
+      <div class="project-text">
+        <h3>Project Two</h3>
+        <p>Immersive portfolio experience</p>
+      </div>
+    </div>
+
+    <div class="project-card">
+      <img src="project3.jpg" alt="Project 3 preview" class="project-image" />
+      <div class="project-overlay"></div>
+      <div class="project-text">
+        <h3>Project Three</h3>
+        <p>Playful interactive game</p>
+      </div>
+    </div>
+
+    <!-- Add more project-card blocks as needed -->
+  </section>
+
+  <!-- === Contact === -->
+  <section id="contact" class="container">
+    <h2>Contact Me</h2>
+    <form class="contact-form">
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name" required />
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required />
+      </div>
+      <div class="form-group">
+        <label for="message">Message</label>
+        <textarea id="message" name="message" rows="5" required></textarea>
+      </div>
+      <button type="submit" class="btn">Send Message</button>
+    </form>
+  </section>
+
+  <!-- === Footer === -->
+  <footer>
+    <p>© 2025 Alfred. All rights reserved.</p>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Project 1</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: #fff;
+            padding: 32px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            max-width: 600px;
+            margin: auto;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 16px;
+        }
+        p {
+            color: #555;
+            font-size: 1em;
+
+
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome Crazy Pong</h1>
+        <p>This is a starter HTML file for your new project. You can add your content and features here.</p>
+    </div>
+    <div style="text-align:center; margin-top:40px;">
+        <canvas id="pong" width="600" height="400" style="background:#222; display:block; margin:auto; border-radius:8px;"></canvas>
+        <p>Use W/S (left paddle) and Up/Down (right paddle) to play.</p>
+    </div>
+    <script>
+    // Timer reset logic
+    const canvas = document.getElementById('pong');
+    canvas.width = 900;
+    canvas.height = 600;
+    const ctx = canvas.getContext('2d');
+
+    const paddleWidth = 10, paddleHeight = 100;
+
+    // Add Start Game button logic
+    // Add Start Game button to the page
+    const startBtn = document.createElement('button');
+    startBtn.id = "startBtn";
+    startBtn.textContent = "Start Game";
+    startBtn.style.display = "block";
+    startBtn.style.margin = "30px auto";
+    startBtn.style.padding = "16px 32px";
+    startBtn.style.fontSize = "1.2em";
+    startBtn.style.borderRadius = "8px";
+    startBtn.style.border = "none";
+
+// Add speed selector dropdown
+const speedLabel = document.createElement('label');
+speedLabel.textContent = "Ball Speed: ";
+speedLabel.style.display = "block";
+speedLabel.style.margin = "10px auto";
+speedLabel.style.textAlign = "center";
+speedLabel.htmlFor = "speedSelect";
+
+const speedSelect = document.createElement('select');
+speedSelect.id = "speedSelect";
+speedSelect.style.fontSize = "1em";
+speedSelect.style.margin = "0 8px";
+["Slow", "Normal", "Fast", "Insane"].forEach((label, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = label;
+    speedSelect.appendChild(opt);
+});
+speedSelect.value = "1"; // Default to Normal
+
+speedLabel.appendChild(speedSelect);
+
+// Find the canvas container to insert controls after it
+const canvasContainer = canvas.parentElement;
+canvasContainer.parentElement.insertBefore(speedLabel, canvasContainer.nextSibling);
+canvasContainer.parentElement.insertBefore(startBtn, speedLabel.nextSibling);
+
+let ballSpeedPreset = [1, 2, 4, 7];
+speedSelect.addEventListener('change', () => {
+    const idx = parseInt(speedSelect.value);
+    const speed = ballSpeedPreset[idx];
+    const angle = Math.atan2(ballVY, ballVX);
+    ballVX = speed * Math.cos(angle);
+    ballVY = speed * Math.sin(angle);
+});
+startBtn.style.background = "#333";
+startBtn.style.color = "#fff";
+startBtn.style.cursor = "pointer";
+
+let gameStarted = false;
+
+startBtn.addEventListener('click', startGame);
+
+// Hide canvas and timer until game starts
+canvas.style.display = "none";
+startBtn.style.display = "block";
+
+function startGame() {
+    gameStarted = true;
+    canvas.style.display = "block";
+    startBtn.style.display = "none";
+    pauseBtn.style.display = "block";
+    gameLoop();
+}
+
+// Add Pause button
+const pauseBtn = document.createElement('button');
+pauseBtn.id = "pauseBtn";
+pauseBtn.textContent = "Pause";
+pauseBtn.style.display = "none";
+pauseBtn.style.margin = "10px auto";
+pauseBtn.style.padding = "12px 28px";
+
+// Add Resume button
+const resumeBtn = document.createElement('button');
+resumeBtn.id = "resumeBtn";
+resumeBtn.textContent = "Resume";
+resumeBtn.style.display = "none";
+resumeBtn.style.margin = "10px auto";
+resumeBtn.style.padding = "12px 28px";
+resumeBtn.style.fontSize = "1.1em";
+resumeBtn.style.borderRadius = "8px";
+resumeBtn.style.border = "none";
+resumeBtn.style.background = "#007bff";
+resumeBtn.style.color = "#fff";
+resumeBtn.style.cursor = "pointer";
+canvasContainer.parentElement.insertBefore(resumeBtn, pauseBtn.nextSibling);
+
+resumeBtn.addEventListener('click', () => {
+    paused = false;
+    pauseBtn.textContent = "Pause";
+    pauseBtn.style.display = "block";
+    resumeBtn.style.display = "none";
+    // Restore ball velocity when resuming
+    ballVX = savedBallVX;
+    ballVY = savedBallVY;
+    if (gameStarted) {
+        gameLoop();
+    }
+});
+
+pauseBtn.addEventListener('click', () => {
+    paused = !paused;
+    pauseBtn.textContent = paused ? "Resume" : "Pause";
+    if (paused) {
+        pauseBtn.style.display = "none";
+        resumeBtn.style.display = "block";
+    } else {
+        pauseBtn.style.display = "block";
+        resumeBtn.style.display = "none";
+        if (gameStarted) gameLoop();
+    }
+});
+pauseBtn.style.fontSize = "1.1em";
+pauseBtn.style.borderRadius = "8px";
+pauseBtn.style.border = "none";
+pauseBtn.style.background = "#555";
+
+// Pause logic: stop the ball when paused, restore when resumed
+let savedBallVX = 0, savedBallVY = 0;
+pauseBtn.addEventListener('click', () => {
+    paused = !paused;
+    pauseBtn.textContent = paused ? "Resume" : "Pause";
+    if (paused) {
+        savedBallVX = ballVX;
+        savedBallVY = ballVY;
+        ballVX = 0;
+        ballVY = 0;
+    } else {
+        ballVX = savedBallVX;
+        ballVY = savedBallVY;
+        if (gameStarted) gameLoop();
+    }
+});
+pauseBtn.style.color = "#fff";
+pauseBtn.style.cursor = "pointer";
+canvasContainer.parentElement.insertBefore(pauseBtn, startBtn.nextSibling);
+
+let paused = false;
+
+pauseBtn.addEventListener('click', () => {
+    paused = !paused;
+    pauseBtn.textContent = paused ? "Resume" : "Pause";
+    if (!paused && gameStarted) gameLoop();
+});
+
+function gameLoop() {
+if (gameStarted && !paused) {
+    update();
+    draw();
+    requestAnimationFrame(gameLoop);
+}
+}
+    let leftY = canvas.height/2 - paddleHeight/2;
+    let rightY = canvas.height/2 - paddleHeight/2;
+
+    let leftVY = 0, rightVY = 0;
+    const paddleAccel = 1.2;
+    const paddleMaxSpeed = 10;
+    const paddleFriction = 0.85;
+
+    let ballX = canvas.width/2, ballY = canvas.height/2;
+    let ballVX = 2, ballVY = 1.2;
+    const ballSize = 12;
+    let crazyMode = false;
+    let startTime = Date.now();
+
+    function drawTimer() {
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        ctx.font = "32px Arial";
+        ctx.fillStyle = "#fff";
+        ctx.textAlign = "center";
+        ctx.fillText(`Time: ${elapsed}s`, canvas.width / 2, 40);
+    }
+
+    setTimeout(() => {
+        crazyMode = true;
+        // Make the ball super fast in crazy mode
+        const speed = 6;
+        const angle = Math.atan2(ballVY, ballVX);
+        ballVX = speed * Math.cos(angle);
+        ballVY = speed * Math.sin(angle);
+    }, 20000);
+
+    function draw() {
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(10, leftY, paddleWidth, paddleHeight);
+        ctx.fillRect(canvas.width-20, rightY, paddleWidth, paddleHeight);
+        ctx.beginPath();
+        ctx.arc(ballX, ballY, ballSize, 0, Math.PI*2);
+        ctx.fill();
+        drawTimer();
+    }
+
+    const keys = {};
+    document.addEventListener('keydown', e => { keys[e.key] = true; });
+    document.addEventListener('keyup', e => { keys[e.key] = false; });
+    const ballSpeedIncrease = 1.08;
+
+    function increaseBallSpeed() {
+        const speed = Math.sqrt(ballVX * ballVX + ballVY * ballVY) * 2.5; // Increase multiplier for more noticeable speed up
+        const angle = Math.atan2(ballVY, ballVX);
+        ballVX = speed * Math.cos(angle);
+        ballVY = speed * Math.sin(angle);
+    }
+    function movePaddles() {
+        // Left paddle
+        if(keys['w']) leftVY -= paddleAccel;
+        if(keys['s']) leftVY += paddleAccel;
+        leftVY *= paddleFriction;
+        leftVY = Math.max(-paddleMaxSpeed, Math.min(paddleMaxSpeed, leftVY));
+        leftY += leftVY;
+        leftY = Math.max(0, Math.min(canvas.height-paddleHeight, leftY));
+
+        // Right paddle
+        if(keys['ArrowUp']) rightVY -= paddleAccel;
+        if(keys['ArrowDown']) rightVY += paddleAccel;
+        rightVY *= paddleFriction;
+        rightVY = Math.max(-paddleMaxSpeed, Math.min(paddleMaxSpeed, rightVY));
+        rightY += rightVY;
+        rightY = Math.max(0, Math.min(canvas.height-paddleHeight, rightY));
+    }
+
+    function update() {
+        movePaddles();
+        ballX += ballVX;
+        ballY += ballVY;
+
+        if(ballY-ballSize < 0 || ballY+ballSize > canvas.height) ballVY *= -1;
+        if(ballX-ballSize < 20 && ballY > leftY && ballY < leftY+paddleHeight) ballVX *= -1;
+        if(ballX+ballSize > canvas.width-20 && ballY > rightY && ballY < rightY+paddleHeight) ballVX *= -1;
+
+        if(ballX < 0 || ballX > canvas.width) {
+            ballX = canvas.width/2; ballY = canvas.height/2;
+            ballVX = (Math.random()>0.5?2:-2);
+            ballVY = (Math.random()>0.5?1.2:-1.2); // Reset to default speed
+            const idx = parseInt(speedSelect.value); // Get current speed preset
+            const speed = ballSpeedPreset[idx];
+            ballVX = (ballVX > 0 ? 1 : -1) * speed; // Apply the selected speed preset
+            startTime = Date.now(); // Reset timer after every point
+        }
+    }
+
+    function gameLoop() {
+        if (gameStarted) {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+    }
+
+    // Remove auto-start; game starts only after button click
+    </script>
+</body>
+</html>
